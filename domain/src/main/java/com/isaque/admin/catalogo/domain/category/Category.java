@@ -1,6 +1,7 @@
 package com.isaque.admin.catalogo.domain.category;
 
 import com.isaque.admin.catalogo.domain.AggregateRoot;
+import com.isaque.admin.catalogo.domain.validation.ValidationHandler;
 
 import java.time.Instant;
 
@@ -46,6 +47,11 @@ public class Category extends AggregateRoot<CategoryID> {
                 now,
                 null
         );
+    }
+
+    @Override
+    public void validate(final ValidationHandler handler) {
+        new CategoryValidator(this, handler).validate();
     }
 
     public String getName() {
