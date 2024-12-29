@@ -9,12 +9,12 @@ import java.util.List;
 public class ThrowsValidationHandler implements ValidationHandler {
     @Override
     public ValidationHandler append(final Error error) {
-        throw new DomainException(List.of(error));
+        throw DomainException.with(error);
     }
 
     @Override
     public ValidationHandler append(final ValidationHandler handler) {
-        throw new DomainException(handler.getErrors());
+        throw DomainException.with(handler.getErrors());
     }
 
     @Override
@@ -22,7 +22,7 @@ public class ThrowsValidationHandler implements ValidationHandler {
         try {
             validation.validate();
         } catch (final Exception ex) {
-            throw DomainException.with(List.of(new Error(ex.getMessage())));
+            throw DomainException.with(new Error(ex.getMessage()));
         }
         return this;
     }
