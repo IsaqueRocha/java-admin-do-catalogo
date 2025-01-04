@@ -122,5 +122,4 @@ public class CreateCategoryUseCaseTest {
                         && Objects.isNull(category.getDeletedAt())
                 ));
     }
-
 }
