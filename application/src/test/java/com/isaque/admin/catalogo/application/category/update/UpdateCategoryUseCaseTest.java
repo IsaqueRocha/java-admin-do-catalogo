@@ -1,6 +1,5 @@
 package com.isaque.admin.catalogo.application.category.update;
 
-import com.isaque.admin.catalogo.application.category.create.CreateCategoryCommand;
 import com.isaque.admin.catalogo.domain.category.Category;
 import com.isaque.admin.catalogo.domain.category.CategoryGateway;
 import com.isaque.admin.catalogo.domain.category.CategoryID;
