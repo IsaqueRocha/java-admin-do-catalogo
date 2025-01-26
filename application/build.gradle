@@ -9,6 +9,10 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    mockitoAgent
+}
+
 dependencies {
     implementation project(':domain')
 
@@ -19,8 +23,17 @@ dependencies {
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+    mockitoAgent('org.mockito:mockito-core:5.14.1') {
+        transitive = false
+    }
 }
 
 test {
     useJUnitPlatform()
+}
+
+tasks {
+    test {
+        jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
+    }
 }
