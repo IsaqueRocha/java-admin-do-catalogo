@@ -4,6 +4,7 @@ import com.isaque.admin.catalogo.domain.AggregateRoot;
 import com.isaque.admin.catalogo.domain.validation.ValidationHandler;
 
 import java.time.Instant;
+import java.util.Objects;
 
 public class Category extends AggregateRoot<CategoryID> implements Cloneable {
     private String name;
@@ -26,8 +27,8 @@ public class Category extends AggregateRoot<CategoryID> implements Cloneable {
         this.name = name;
         this.description = description;
         this.active = isActive;
-        this.createdAt = creationDate;
-        this.updatedAt = updateDate;
+        this.createdAt = Objects.requireNonNull(creationDate, "'createdAt' should not be null");
+        this.updatedAt = Objects.requireNonNull(updateDate, "'updateAt' should not be null");
         this.deletedAt = deleteDate;
     }
 
@@ -63,7 +64,8 @@ public class Category extends AggregateRoot<CategoryID> implements Cloneable {
         final Instant updatedAt,
         final Instant deletedAt
         ){
-        return new Category(id, name, description, active, createdAt, updatedAt, deletedAt);
+        return new Category(
+                id,name,description,active,createdAt,updatedAt,deletedAt);
     }
 
     @Override
