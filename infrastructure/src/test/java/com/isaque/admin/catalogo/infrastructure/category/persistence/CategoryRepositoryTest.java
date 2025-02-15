@@ -1,7 +1,7 @@
 package com.isaque.admin.catalogo.infrastructure.category.persistence;
 
 import com.isaque.admin.catalogo.domain.category.Category;
-import com.isaque.admin.catalogo.infrastructure.MySQLGatewayTest;
+import com.isaque.admin.catalogo.MySQLGatewayTest;
 import org.hibernate.PropertyValueException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
