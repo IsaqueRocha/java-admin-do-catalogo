@@ -4,7 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isaque.admin.catalogo.ControllerTest;
 import com.isaque.admin.catalogo.application.category.create.CreateCategoryOutput;
 import com.isaque.admin.catalogo.application.category.create.CreateCategoryUseCase;
+import com.isaque.admin.catalogo.application.category.retrive.get.CategoryOutput;
+import com.isaque.admin.catalogo.application.category.retrive.get.GetCategoryByIdUseCase;
+import com.isaque.admin.catalogo.domain.category.Category;
+import com.isaque.admin.catalogo.domain.category.CategoryID;
 import com.isaque.admin.catalogo.domain.exceptions.DomainException;
+import com.isaque.admin.catalogo.domain.exceptions.NotFoundException;
 import com.isaque.admin.catalogo.domain.validation.Error;
 import com.isaque.admin.catalogo.domain.validation.handler.Notification;
 import com.isaque.admin.catalogo.infrastructure.category.models.CreateCategoryRequest;
@@ -35,6 +40,9 @@ public class CategoryAPITest {
     @MockitoBean
     private CreateCategoryUseCase createCategoryUseCase;
 
+    @MockitoBean
+    private GetCategoryByIdUseCase getCategoryByIdUseCase;
+
     @Autowired
     private ObjectMapper mapper;
 
@@ -44,7 +52,6 @@ public class CategoryAPITest {
         final var expectedName = "Filmes";
         final var expectedDescription = "A categoria mais assistida";
         final var expectedIsActive = true;
-
         final var input = new CreateCategoryRequest(expectedName, expectedDescription, expectedIsActive);
 
         when(createCategoryUseCase.execute(any()))
@@ -56,14 +63,14 @@ public class CategoryAPITest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(this.mapper.writeValueAsString(input));
 
+        final var response = this.mvc.perform(request)
+                .andDo(MockMvcResultHandlers.print());
+
         // then
-        this.mvc.perform(request)
-                .andDo(MockMvcResultHandlers.print())
-                .andExpectAll(
-                        MockMvcResultMatchers.status().isCreated(),
-                        MockMvcResultMatchers.header().string("Location", "/categories/123"),
-                        MockMvcResultMatchers.header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE),
-                        MockMvcResultMatchers.jsonPath("$.id").value("123")
+        response.andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.header().string("Location", "/categories/123"))
+                .andExpect(MockMvcResultMatchers.header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("123")
                 );
 
         Mockito.verify(createCategoryUseCase, Mockito.times(1))
@@ -82,7 +89,6 @@ public class CategoryAPITest {
         final var expectedDescription = "A categoria mais assistida";
         final var expectedIsActive = true;
         final var expectedErrorMessage = "'name' must not be null";
-
         final var input = new CreateCategoryRequest(expectedName, expectedDescription, expectedIsActive);
 
         when(createCategoryUseCase.execute(any()))
@@ -95,9 +101,10 @@ public class CategoryAPITest {
                 .content(this.mapper.writeValueAsString(input));
 
         // then
-        this.mvc.perform(request)
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
+        final var response = this.mvc.perform(request)
+                .andDo(MockMvcResultHandlers.print());
+
+        response.andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
                 .andExpect(MockMvcResultMatchers.header().string("Location", Matchers.nullValue()))
                 .andExpect(MockMvcResultMatchers.header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.errors", Matchers.hasSize(1)))
@@ -118,7 +125,6 @@ public class CategoryAPITest {
         final var expectedDescription = "A categoria mais assistida";
         final var expectedIsActive = true;
         final var expectedErrorMessage = "'name' must not be null";
-
         final var input = new CreateCategoryRequest(expectedName, expectedDescription, expectedIsActive);
 
         when(createCategoryUseCase.execute(any()))
@@ -130,10 +136,11 @@ public class CategoryAPITest {
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(this.mapper.writeValueAsString(input));
 
+        final var response = this.mvc.perform(request)
+                .andDo(MockMvcResultHandlers.print());
+
         // then
-        this.mvc.perform(request)
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
+        response.andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
                 .andExpect(MockMvcResultMatchers.header().string("Location", Matchers.nullValue()))
                 .andExpect(MockMvcResultMatchers.header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.equalTo(expectedErrorMessage)))
@@ -146,5 +153,67 @@ public class CategoryAPITest {
                                 && Objects.equals(expectedDescription, cmd.description())
                                 && Objects.equals(expectedIsActive, cmd.isActive())
                 ));
+    }
+
+    @Test
+    void givenAValidCategoryId_whenCallsGetCategoryById_thenShouldReturnCategory() throws Exception {
+        // given
+        final String expectedName = "Filmes";
+        final var expectedDescription = "A categoria mais assistida";
+        final var expectedIsActive = true;
+
+        final var category = Category.newCategory(
+                expectedName,
+                expectedDescription,
+                expectedIsActive
+        );
+
+        final var expectedId = category.getId().getValue();
+
+        // when
+        Mockito.when(getCategoryByIdUseCase.execute(Mockito.any()))
+                .thenReturn(CategoryOutput.from(category));
+
+        final var request = MockMvcRequestBuilders.get("/categories/{id}", expectedId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE);
+
+        final var response = this.mvc.perform(request)
+                .andDo(MockMvcResultHandlers.print());
+
+        // then
+
+        response.andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.equalTo(expectedId)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.equalTo(expectedName)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.equalTo(expectedDescription)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.is_active", Matchers.equalTo(expectedIsActive)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.created_at", Matchers.equalTo(category.getCreatedAt().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.updated_at", Matchers.equalTo(category.getUpdatedAt().toString())))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.deleted_at", Matchers.equalTo(category.getDeletedAt())));
+
+        Mockito.verify(getCategoryByIdUseCase, Mockito.times(1))
+                .execute(expectedId);
+    }
+
+    @Test
+    public void givenAInvalidId_whenCallsGetCategory_shouldReturnNotFound() throws Exception {
+        // given
+        final var expectedErrorMessage = "Category with id 123 was not found";
+        final var expectedId = CategoryID.from("123");
+
+        Mockito.when(getCategoryByIdUseCase.execute(Mockito.any()))
+                .thenThrow(NotFoundException.with(Category.class, expectedId));
+
+        // when
+        final var request = MockMvcRequestBuilders.get("/categories/{id}", expectedId.getValue())
+                .contentType(MediaType.APPLICATION_JSON_VALUE);
+        final var response = this.mvc.perform(request)
+                .andDo(MockMvcResultHandlers.print());
+
+        // then
+        response.andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.equalTo(expectedErrorMessage)));
     }
 }

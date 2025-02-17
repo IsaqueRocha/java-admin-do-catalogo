@@ -5,6 +5,7 @@ import com.isaque.admin.catalogo.domain.category.Category;
 import com.isaque.admin.catalogo.domain.category.CategoryGateway;
 import com.isaque.admin.catalogo.domain.category.CategoryID;
 import com.isaque.admin.catalogo.domain.exceptions.DomainException;
+import com.isaque.admin.catalogo.domain.exceptions.NotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +58,7 @@ public class GetCategoryByIdUseCaseTest {
     }
 
     @Test
-    void givenAInvalidId_whenCallsGetCategory_shoulReturnsNotFound() {
+    void givenAInvalidId_whenCallsGetCategory_shouldReturnsNotFound() {
         final var expectedErrorMessage = "Category with id 123 was not found";
 
         final var expectedId = CategoryID.from("123");
@@ -65,7 +66,7 @@ public class GetCategoryByIdUseCaseTest {
         Mockito.when(categoryGateway.findById(expectedId)).thenReturn(Optional.empty());
 
         final var actualException = Assertions.assertThrows(
-                DomainException.class,
+                NotFoundException.class,
                 () -> useCase.execute(expectedId.getValue())
         );
 

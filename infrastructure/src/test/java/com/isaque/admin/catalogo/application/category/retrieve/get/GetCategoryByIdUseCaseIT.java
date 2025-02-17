@@ -5,13 +5,12 @@ import com.isaque.admin.catalogo.application.category.retrive.get.GetCategoryByI
 import com.isaque.admin.catalogo.domain.category.Category;
 import com.isaque.admin.catalogo.domain.category.CategoryGateway;
 import com.isaque.admin.catalogo.domain.category.CategoryID;
-import com.isaque.admin.catalogo.domain.exceptions.DomainException;
+import com.isaque.admin.catalogo.domain.exceptions.NotFoundException;
 import com.isaque.admin.catalogo.infrastructure.category.persistence.CategoryJpaEntity;
 import com.isaque.admin.catalogo.infrastructure.category.persistence.CategoryRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
 import java.util.Arrays;
@@ -59,7 +58,7 @@ public class GetCategoryByIdUseCaseIT {
         final var expectedId = CategoryID.from("123");
 
         final var actualException = Assertions.assertThrows(
-                DomainException.class,
+                NotFoundException.class,
                 () -> useCase.execute(expectedId.getValue())
         );
 
