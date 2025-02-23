@@ -3,7 +3,11 @@ package com.isaque.admin.catalogo.infrastructure.api.controllers;
 import com.isaque.admin.catalogo.application.category.create.CreateCategoryCommand;
 import com.isaque.admin.catalogo.application.category.create.CreateCategoryOutput;
 import com.isaque.admin.catalogo.application.category.create.CreateCategoryUseCase;
+import com.isaque.admin.catalogo.application.category.retrive.get.CategoryOutput;
 import com.isaque.admin.catalogo.application.category.retrive.get.GetCategoryByIdUseCase;
+import com.isaque.admin.catalogo.application.category.update.UpdateCategoryCommand;
+import com.isaque.admin.catalogo.application.category.update.UpdateCategoryOutput;
+import com.isaque.admin.catalogo.application.category.update.UpdateCategoryUseCase;
 import com.isaque.admin.catalogo.domain.pagination.Pagination;
 import com.isaque.admin.catalogo.domain.validation.handler.Notification;
 import com.isaque.admin.catalogo.infrastructure.api.CategoryAPI;
@@ -21,14 +25,16 @@ import java.util.function.Function;
 public class CategoryController implements CategoryAPI {
     private final CreateCategoryUseCase createCategoryUseCase;
     private final GetCategoryByIdUseCase getCategoryByIdUseCase;
+    private final UpdateCategoryUseCase updateCategoryUseCase;
 
     public CategoryController(
             final CreateCategoryUseCase createCategoryUseCase,
-            final GetCategoryByIdUseCase getCategoryByIdUseCase
+            final GetCategoryByIdUseCase getCategoryByIdUseCase,
+            final UpdateCategoryUseCase updateCategoryUseCase
     ) {
         this.createCategoryUseCase = Objects.requireNonNull(createCategoryUseCase);
         this.getCategoryByIdUseCase = Objects.requireNonNull(getCategoryByIdUseCase);
-    }
+        this.updateCategoryUseCase = Objects.requireNonNull(updateCategoryUseCase);}
 
     @Override
     public ResponseEntity<?> createCategory(final CreateCategoryRequest input) {
@@ -61,5 +67,22 @@ public class CategoryController implements CategoryAPI {
     @Override
     public CategoryApiOutput getById(final String id) {
         return CategoryApiPresenter.present(this.getCategoryByIdUseCase.execute(id));
+    }
+
+    @Override
+    public ResponseEntity<?> updateById(final String id, final CreateCategoryRequest input) {
+        final var command = UpdateCategoryCommand.with(
+                id,
+                input.name(),
+                input.description(),
+                input.active() != null ? input.active() : Boolean.TRUE
+        );
+
+        final Function<Notification, ResponseEntity<?>> onError =
+                notification -> ResponseEntity.unprocessableEntity().body(notification);
+
+        final Function<UpdateCategoryOutput, ResponseEntity<?>> onSuccess = ResponseEntity::ok;
+
+        return this.updateCategoryUseCase.execute(command).fold(onError, onSuccess);
     }
 }

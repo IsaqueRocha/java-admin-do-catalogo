@@ -4,6 +4,7 @@ import com.isaque.admin.catalogo.IntegrationTest;
 import com.isaque.admin.catalogo.domain.category.Category;
 import com.isaque.admin.catalogo.domain.category.CategoryGateway;
 import com.isaque.admin.catalogo.domain.exceptions.DomainException;
+import com.isaque.admin.catalogo.domain.exceptions.NotFoundException;
 import com.isaque.admin.catalogo.infrastructure.category.persistence.CategoryJpaEntity;
 import com.isaque.admin.catalogo.infrastructure.category.persistence.CategoryRepository;
 import org.junit.jupiter.api.Assertions;
@@ -188,7 +189,7 @@ public class UpdateCategoryUseCaseIT {
         );
 
         final var actualException =
-                Assertions.assertThrows(DomainException.class, () -> useCase.execute(command));
+                Assertions.assertThrows(NotFoundException.class, () -> useCase.execute(command));
 
         Assertions.assertEquals(expectedErrorMessage, actualException.getMessage());
     }
