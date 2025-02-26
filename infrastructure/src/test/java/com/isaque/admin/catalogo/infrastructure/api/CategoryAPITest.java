@@ -4,21 +4,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.isaque.admin.catalogo.ControllerTest;
 import com.isaque.admin.catalogo.application.category.create.CreateCategoryOutput;
 import com.isaque.admin.catalogo.application.category.create.CreateCategoryUseCase;
+import com.isaque.admin.catalogo.application.category.delete.DeleteCategoryUseCase;
 import com.isaque.admin.catalogo.application.category.retrive.get.CategoryOutput;
 import com.isaque.admin.catalogo.application.category.retrive.get.GetCategoryByIdUseCase;
+import com.isaque.admin.catalogo.application.category.retrive.list.CategoryListOutput;
+import com.isaque.admin.catalogo.application.category.retrive.list.ListCategoriesUseCase;
 import com.isaque.admin.catalogo.application.category.update.UpdateCategoryOutput;
 import com.isaque.admin.catalogo.application.category.update.UpdateCategoryUseCase;
 import com.isaque.admin.catalogo.domain.category.Category;
 import com.isaque.admin.catalogo.domain.category.CategoryID;
 import com.isaque.admin.catalogo.domain.exceptions.DomainException;
 import com.isaque.admin.catalogo.domain.exceptions.NotFoundException;
+import com.isaque.admin.catalogo.domain.pagination.Pagination;
 import com.isaque.admin.catalogo.domain.validation.Error;
 import com.isaque.admin.catalogo.domain.validation.handler.Notification;
 import com.isaque.admin.catalogo.infrastructure.category.models.CreateCategoryRequest;
 import com.isaque.admin.catalogo.infrastructure.category.models.UpdateCategoryRequest;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,15 +29,20 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.util.MultiValueMap;
 
-import javax.naming.InvalidNameException;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static io.vavr.API.Left;
 import static io.vavr.API.Right;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ControllerTest(controllers = CategoryAPI.class)
 public class CategoryAPITest {
@@ -49,6 +57,12 @@ public class CategoryAPITest {
 
     @MockitoBean
     private UpdateCategoryUseCase updateCategoryUseCase;
+
+    @MockitoBean
+    private DeleteCategoryUseCase deleteCategoryUseCase;
+
+    @MockitoBean
+    private ListCategoriesUseCase listCategoriesUseCase;
 
     @Autowired
     private ObjectMapper mapper;
@@ -74,14 +88,14 @@ public class CategoryAPITest {
                 .andDo(MockMvcResultHandlers.print());
 
         // then
-        response.andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.header().string("Location", "/categories/123"))
-                .andExpect(MockMvcResultMatchers.header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value("123")
+        response.andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/categories/123"))
+                .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id").value("123")
                 );
 
         Mockito.verify(createCategoryUseCase, Mockito.times(1))
-                .execute(ArgumentMatchers.argThat(cmd ->
+                .execute(argThat(cmd ->
                         Objects.equals(expectedName, cmd.name())
                                 && Objects.equals(expectedDescription, cmd.description())
                                 && Objects.equals(expectedIsActive, cmd.isActive())
@@ -111,14 +125,14 @@ public class CategoryAPITest {
         final var response = this.mvc.perform(request)
                 .andDo(MockMvcResultHandlers.print());
 
-        response.andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
-                .andExpect(MockMvcResultMatchers.header().string("Location", Matchers.nullValue()))
-                .andExpect(MockMvcResultMatchers.header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errors", Matchers.hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message").value(expectedErrorMessage));
+        response.andExpect(status().isUnprocessableEntity())
+                .andExpect(header().string("Location", Matchers.nullValue()))
+                .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors[0].message").value(expectedErrorMessage));
 
         Mockito.verify(createCategoryUseCase, Mockito.times(1))
-                .execute(ArgumentMatchers.argThat(cmd ->
+                .execute(argThat(cmd ->
                         Objects.equals(expectedName, cmd.name())
                                 && Objects.equals(expectedDescription, cmd.description())
                                 && Objects.equals(expectedIsActive, cmd.isActive())
@@ -147,15 +161,15 @@ public class CategoryAPITest {
                 .andDo(MockMvcResultHandlers.print());
 
         // then
-        response.andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
-                .andExpect(MockMvcResultMatchers.header().string("Location", Matchers.nullValue()))
-                .andExpect(MockMvcResultMatchers.header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.equalTo(expectedErrorMessage)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errors", Matchers.hasSize(1)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].message").value(expectedErrorMessage));
+        response.andExpect(status().isUnprocessableEntity())
+                .andExpect(header().string("Location", Matchers.nullValue()))
+                .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.message", equalTo(expectedErrorMessage)))
+                .andExpect(jsonPath("$.errors", hasSize(1)))
+                .andExpect(jsonPath("$.errors[0].message").value(expectedErrorMessage));
 
         Mockito.verify(createCategoryUseCase, Mockito.times(1))
-                .execute(ArgumentMatchers.argThat(cmd ->
+                .execute(argThat(cmd ->
                         Objects.equals(expectedName, cmd.name())
                                 && Objects.equals(expectedDescription, cmd.description())
                                 && Objects.equals(expectedIsActive, cmd.isActive())
@@ -189,15 +203,15 @@ public class CategoryAPITest {
 
         // then
 
-        response.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.equalTo(expectedId)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name", Matchers.equalTo(expectedName)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.description", Matchers.equalTo(expectedDescription)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.is_active", Matchers.equalTo(expectedIsActive)))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.created_at", Matchers.equalTo(category.getCreatedAt().toString())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.updated_at", Matchers.equalTo(category.getUpdatedAt().toString())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.deleted_at", Matchers.equalTo(category.getDeletedAt())));
+        response.andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id", equalTo(expectedId)))
+                .andExpect(jsonPath("$.name", equalTo(expectedName)))
+                .andExpect(jsonPath("$.description", equalTo(expectedDescription)))
+                .andExpect(jsonPath("$.is_active", equalTo(expectedIsActive)))
+                .andExpect(jsonPath("$.created_at", equalTo(category.getCreatedAt().toString())))
+                .andExpect(jsonPath("$.updated_at", equalTo(category.getUpdatedAt().toString())))
+                .andExpect(jsonPath("$.deleted_at", equalTo(category.getDeletedAt())));
 
         Mockito.verify(getCategoryByIdUseCase, Mockito.times(1))
                 .execute(expectedId);
@@ -219,9 +233,9 @@ public class CategoryAPITest {
                 .andDo(MockMvcResultHandlers.print());
 
         // then
-        response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", Matchers.equalTo(expectedErrorMessage)));
+        response.andExpect(status().isNotFound())
+                .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.message", equalTo(expectedErrorMessage)));
     }
 
     @Test
@@ -246,12 +260,12 @@ public class CategoryAPITest {
                 .andDo(MockMvcResultHandlers.print());
 
         // then
-        response.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.id", Matchers.equalTo(expectedId)));
+        response.andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.id", equalTo(expectedId)));
 
         Mockito.verify(updateCategoryUseCase, Mockito.times(1))
-                .execute(ArgumentMatchers.argThat(cmd ->
+                .execute(argThat(cmd ->
                         Objects.equals(expectedName, cmd.name())
                                 && Objects.equals(expectedDescription, cmd.description())
                                 && Objects.equals(expectedIsActive, cmd.isActive())
@@ -266,7 +280,7 @@ public class CategoryAPITest {
         final var expectedDescription = "A categoria mais assistida";
         final var expectedIsActive = true;
 
-        final var expectedErrorMessage =  "Category with id " + expectedId + " was not found";
+        final var expectedErrorMessage = "Category with id " + expectedId + " was not found";
 
         final var command = new UpdateCategoryRequest(expectedName, expectedDescription, expectedIsActive);
 
@@ -282,16 +296,16 @@ public class CategoryAPITest {
                 .andDo(MockMvcResultHandlers.print());
 
         // then
-        response.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.header().string(
+        response.andExpect(status().isNotFound())
+                .andExpect(header().string(
                         "Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 )
-                .andExpect(MockMvcResultMatchers.jsonPath(
-                        "$.message", Matchers.equalTo(expectedErrorMessage)
+                .andExpect(jsonPath(
+                        "$.message", equalTo(expectedErrorMessage)
                 ));
 
         Mockito.verify(updateCategoryUseCase, Mockito.times(1))
-                .execute(ArgumentMatchers.argThat(cmd ->
+                .execute(argThat(cmd ->
                         Objects.equals(expectedName, cmd.name())
                                 && Objects.equals(expectedDescription, cmd.description())
                                 && Objects.equals(expectedIsActive, cmd.isActive())
@@ -306,7 +320,7 @@ public class CategoryAPITest {
         final var expectedDescription = "A categoria mais assistida";
         final var expectedIsActive = true;
         final var expectedErrorCount = 1;
-        final var expectedErrorMessage =  "'name' must not be null";
+        final var expectedErrorMessage = "'name' must not be null";
 
         final var command = new UpdateCategoryRequest(expectedName, expectedDescription, expectedIsActive);
 
@@ -322,22 +336,105 @@ public class CategoryAPITest {
                 .andDo(MockMvcResultHandlers.print());
 
         // then
-        response.andExpect(MockMvcResultMatchers.status().isUnprocessableEntity())
-                .andExpect(MockMvcResultMatchers.header().string(
+        response.andExpect(status().isUnprocessableEntity())
+                .andExpect(header().string(
                         "Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 )
-                .andExpect(MockMvcResultMatchers.jsonPath(
-                        "$.errors", Matchers.hasSize(expectedErrorCount)
+                .andExpect(jsonPath(
+                        "$.errors", hasSize(expectedErrorCount)
                 ))
-                .andExpect(MockMvcResultMatchers.jsonPath(
-                        "$.errors[0].message", Matchers.equalTo(expectedErrorMessage)
+                .andExpect(jsonPath(
+                        "$.errors[0].message", equalTo(expectedErrorMessage)
                 ));
 
         Mockito.verify(updateCategoryUseCase, Mockito.times(1))
-                .execute(ArgumentMatchers.argThat(cmd ->
+                .execute(argThat(cmd ->
                         Objects.equals(expectedName, cmd.name())
                                 && Objects.equals(expectedDescription, cmd.description())
                                 && Objects.equals(expectedIsActive, cmd.isActive())
                 ));
+    }
+
+    @Test
+    void givenAValidId_whenCallsDeleteCategory_thenShouldReturnNoContent() throws Exception {
+        // given
+        final var expectedId = "123";
+
+        Mockito.doNothing().when(deleteCategoryUseCase).execute(any());
+
+        // when
+        final var request = MockMvcRequestBuilders.delete("/categories/{id}", expectedId)
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE);
+
+        final var response = this.mvc.perform(request).andDo(MockMvcResultHandlers.print());
+
+        response.andExpect(status().isNoContent());
+
+        Mockito.verify(deleteCategoryUseCase, Mockito.atMostOnce()).execute(expectedId);
+    }
+
+    @Test
+    void givenValidParams_whenCallsListCategories_thenShouldReturnCategories() throws Exception {
+        // given
+        final var category = Category.newCategory(
+                "Movies",
+                null,
+                true
+        );
+
+        final var expectedPage = 0;
+        final var expectedPerPage = 10;
+        final var expectedTerms = "movies";
+        final var expectedSort = "description";
+        final var expectedDirection = "desc";
+        final var expectedItemsCount = 1;
+        final var expectedTotal = 1;
+
+        final var expectedItems = List.of(CategoryListOutput.from(category));
+
+        Mockito.when(listCategoriesUseCase.execute(any()))
+                .thenReturn(new Pagination<>(
+                        expectedPage,
+                        expectedPerPage,
+                        expectedTotal,
+                        expectedItems
+                ));
+
+        final var params = Map.of(
+                "page", String.valueOf(expectedPage),
+                "perPage", String.valueOf(expectedPerPage),
+                "sort", expectedSort,
+                "dir", expectedDirection,
+                "search", expectedTerms
+        );
+
+        //when
+        final var request = MockMvcRequestBuilders.get("/categories")
+                .queryParams(MultiValueMap.fromSingleValue(params))
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE);
+
+        final var response = this.mvc.perform(request).andDo(MockMvcResultHandlers.print());
+
+        response.andExpect(status().isOk())
+                .andExpect(jsonPath("$.current_page", equalTo(expectedPage)))
+                .andExpect(jsonPath("$.per_page", equalTo(expectedPerPage)))
+                .andExpect(jsonPath("$.total", equalTo(expectedTotal)))
+                .andExpect(jsonPath("$.items", hasSize(expectedItemsCount)))
+                .andExpect(jsonPath("$.items[0].id", equalTo(category.getId().getValue())))
+                .andExpect(jsonPath("$.items[0].name", equalTo(category.getName())))
+                .andExpect(jsonPath("$.items[0].description", equalTo(category.getDescription())))
+                .andExpect(jsonPath("$.items[0].is_active", equalTo(category.isActive())))
+                .andExpect(jsonPath("$.items[0].created_at", equalTo(category.getCreatedAt().toString())))
+                .andExpect(jsonPath("$.items[0].deleted_at", equalTo(category.getDeletedAt())));
+
+        Mockito.verify(listCategoriesUseCase, Mockito.times(1)).execute(argThat(query ->
+                Objects.equals(expectedPage, query.page())
+                        && Objects.equals(expectedPerPage, query.perPage())
+                        && Objects.equals(expectedDirection, query.direction())
+                        && Objects.equals(expectedSort, query.sort())
+                        && Objects.equals(expectedTerms, query.terms())
+        ));
     }
 }

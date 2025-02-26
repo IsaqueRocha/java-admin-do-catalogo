@@ -5,7 +5,6 @@ import com.isaque.admin.catalogo.domain.category.CategoryGateway;
 import com.isaque.admin.catalogo.domain.category.CategoryID;
 import com.isaque.admin.catalogo.domain.exceptions.DomainException;
 import com.isaque.admin.catalogo.domain.exceptions.NotFoundException;
-import com.isaque.admin.catalogo.domain.validation.Error;
 
 import java.util.Objects;
 import java.util.function.Supplier;

@@ -30,8 +30,7 @@ public class DeleteCategoryUseCaseTest {
         final var category = Category.newCategory(
                 "Filmes",
                 "A categoria mais assistida",
-                true
-        );
+                true);
         final var expectedId = category.getId();
 
         Mockito.doNothing().when(categoryGateway).deleteById(Mockito.eq(expectedId));
@@ -57,11 +56,11 @@ public class DeleteCategoryUseCaseTest {
         final var category = Category.newCategory(
                 "Filmes",
                 "A categoria mais assistida",
-                true
-        );
+                true);
         final var expectedId = category.getId();
 
-        Mockito.doThrow(new IllegalStateException("Gateway error")).when(categoryGateway).deleteById(Mockito.eq(expectedId));
+        Mockito.doThrow(new IllegalStateException("Gateway error")).when(categoryGateway)
+                .deleteById(Mockito.eq(expectedId));
 
         Assertions.assertThrows(IllegalStateException.class, () -> useCase.execute(expectedId.getValue()));
 

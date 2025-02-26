@@ -4,7 +4,6 @@ import com.isaque.admin.catalogo.application.category.retrive.get.DefaultGetCate
 import com.isaque.admin.catalogo.domain.category.Category;
 import com.isaque.admin.catalogo.domain.category.CategoryGateway;
 import com.isaque.admin.catalogo.domain.category.CategoryID;
-import com.isaque.admin.catalogo.domain.exceptions.DomainException;
 import com.isaque.admin.catalogo.domain.exceptions.NotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-public class GetCategoryByIdUseCaseTest {
+class GetCategoryByIdUseCaseTest {
     @InjectMocks
     private DefaultGetCategoryByIdUseCase useCase;
 
@@ -39,8 +38,7 @@ public class GetCategoryByIdUseCaseTest {
         final var category = Category.newCategory(
                 "Filmes",
                 "A categoria mais assistida",
-                true
-        );
+                true);
 
         final var expectedId = category.getId();
 
@@ -67,8 +65,7 @@ public class GetCategoryByIdUseCaseTest {
 
         final var actualException = Assertions.assertThrows(
                 NotFoundException.class,
-                () -> useCase.execute(expectedId.getValue())
-        );
+                () -> useCase.execute(expectedId.getValue()));
 
         Assertions.assertEquals(expectedErrorMessage, actualException.getMessage());
     }
