@@ -14,6 +14,7 @@ import com.isaque.admin.catalogo.domain.pagination.Pagination;
 import com.isaque.admin.catalogo.domain.validation.handler.Notification;
 import com.isaque.admin.catalogo.infrastructure.api.CategoryAPI;
 import com.isaque.admin.catalogo.infrastructure.category.models.CategoryApiOutput;
+import com.isaque.admin.catalogo.infrastructure.category.models.CategoryListResponse;
 import com.isaque.admin.catalogo.infrastructure.category.models.CreateCategoryRequest;
 import com.isaque.admin.catalogo.infrastructure.category.presenters.CategoryApiPresenter;
 import org.springframework.http.ResponseEntity;
@@ -63,14 +64,15 @@ public class CategoryController implements CategoryAPI {
     }
 
     @Override
-    public Pagination<?> listCategories(
+    public Pagination<CategoryListResponse> listCategories(
             final String search,
             final int page,
             final int perPage,
             final String sort,
             final String direction
     ) {
-        return listCategoriesUseCase.execute(new CategorySearchQuery(page, perPage, search, sort, direction));
+        return this.listCategoriesUseCase.execute(new CategorySearchQuery(page, perPage, search, sort, direction))
+                .map(CategoryApiPresenter::present);
     }
 
     @Override

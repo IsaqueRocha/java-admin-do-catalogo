@@ -94,12 +94,13 @@ class UpdateCategoryUseCaseTest {
                 expectedDescription,
                 expectedIsActive);
 
-        Mockito.when(categoryGateway.findById(eq(expectedId))).thenReturn(Optional.of(Category.with(category)));
+        Mockito.when(categoryGateway.findById(eq(expectedId)))
+                .thenReturn(Optional.of(Category.with(category)));
 
         final var notification = useCase.execute(command).getLeft();
 
         Assertions.assertEquals(expectedErrorCount, notification.getErrors().size());
-        Assertions.assertEquals(expectedErrorMessage, notification.getErrors().get(0).message());
+        Assertions.assertEquals(expectedErrorMessage, notification.getErrors().getFirst().message());
 
         Mockito.verify(categoryGateway, Mockito.times(0)).update(any());
     }
