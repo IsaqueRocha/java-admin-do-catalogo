@@ -13,7 +13,7 @@ import com.isaque.admin.catalogo.domain.category.CategorySearchQuery;
 import com.isaque.admin.catalogo.domain.pagination.Pagination;
 import com.isaque.admin.catalogo.domain.validation.handler.Notification;
 import com.isaque.admin.catalogo.infrastructure.api.CategoryAPI;
-import com.isaque.admin.catalogo.infrastructure.category.models.CategoryApiOutput;
+import com.isaque.admin.catalogo.infrastructure.category.models.CategoryResponse;
 import com.isaque.admin.catalogo.infrastructure.category.models.CategoryListResponse;
 import com.isaque.admin.catalogo.infrastructure.category.models.CreateCategoryRequest;
 import com.isaque.admin.catalogo.infrastructure.category.presenters.CategoryApiPresenter;
@@ -76,7 +76,7 @@ public class CategoryController implements CategoryAPI {
     }
 
     @Override
-    public CategoryApiOutput getById(final String id) {
+    public CategoryResponse getById(final String id) {
         return CategoryApiPresenter.present(this.getCategoryByIdUseCase.execute(id));
     }
 

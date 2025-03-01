@@ -1,7 +1,7 @@
 package com.isaque.admin.catalogo.infrastructure.api;
 
 import com.isaque.admin.catalogo.domain.pagination.Pagination;
-import com.isaque.admin.catalogo.infrastructure.category.models.CategoryApiOutput;
+import com.isaque.admin.catalogo.infrastructure.category.models.CategoryResponse;
 import com.isaque.admin.catalogo.infrastructure.category.models.CategoryListResponse;
 import com.isaque.admin.catalogo.infrastructure.category.models.CreateCategoryRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,7 +65,7 @@ public interface CategoryAPI {
             @ApiResponse(responseCode = "404", description = "Category not found"),
             @ApiResponse(responseCode = "500", description = "An internal server error was thrown")
     })
-    CategoryApiOutput getById(@PathVariable(name = "id") String id);
+    CategoryResponse getById(@PathVariable(name = "id") String id);
 
     @PutMapping(
             value = "{id}",
