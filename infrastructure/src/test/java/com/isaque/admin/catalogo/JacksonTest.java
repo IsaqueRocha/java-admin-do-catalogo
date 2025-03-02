@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-@ActiveProfiles("test")
+@ActiveProfiles("test-integration")
 @JsonTest(includeFilters = {
         @ComponentScan.Filter(
                 type = FilterType.ASSIGNABLE_TYPE,
