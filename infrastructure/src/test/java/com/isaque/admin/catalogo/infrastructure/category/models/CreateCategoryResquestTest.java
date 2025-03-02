@@ -36,10 +36,10 @@ class CreateCategoryResquestTest {
 
         final var json = """
                 {
-                  "name": "%s",
-                  "description": "%s",
-                  "is_active": %s
-                }    
+                    "name": "%s",
+                    "description": "%s",
+                    "is_active": %s
+                }
                 """.formatted(expectedName, expectedDescription, expectedIsActive);
 
         final var actualJson = this.json.parse(json);
