@@ -30,8 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @E2ETest
 @Testcontainers
 class CategoryE2ETest {
-    @SuppressWarnings("resource")
     @Container
+    @SuppressWarnings("resource")
     private static final MySQLContainer<?> MYSQL_CONTAINER =
             new MySQLContainer<>("mysql:latest")
                     .withPassword("123456")
@@ -190,11 +190,9 @@ class CategoryE2ETest {
         Assertions.assertEquals(0, categoryRepository.count());
 
         final var actualId = givenACategory("Movies", null, true);
-
         final var expectedName = "Filmes";
         final var expectedDescription = "A categoria mais assistida";
         final var expectedIsActive = true;
-
         final var requestBody = new UpdateCategoryRequest(expectedName, expectedDescription, expectedIsActive);
 
         updateACategory(actualId, requestBody)
@@ -218,9 +216,7 @@ class CategoryE2ETest {
         final var expectedName = "Filmes";
         final var expectedDescription = "A categoria mais assistida";
         final var expectedIsActive = false;
-
         final var actualId = givenACategory(expectedName, expectedDescription, true);
-
         final var requestBody = new UpdateCategoryRequest(expectedName, expectedDescription, expectedIsActive);
 
         updateACategory(actualId, requestBody)
@@ -244,9 +240,7 @@ class CategoryE2ETest {
         final var expectedName = "Filmes";
         final var expectedDescription = "A categoria mais assistida";
         final var expectedIsActive = true;
-
         final var actualId = givenACategory(expectedName, expectedDescription, false);
-
         final var requestBody = new UpdateCategoryRequest(expectedName, expectedDescription, expectedIsActive);
 
         updateACategory(actualId, requestBody)
@@ -299,18 +293,15 @@ class CategoryE2ETest {
             final boolean expectedIsActive
     ) throws Exception {
         final var requestBody = new CreateCategoryRequest(expectedName, expectedDescription, expectedIsActive);
-
         final var request = MockMvcRequestBuilders.post("/categories")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(Json.writeValueAsString(requestBody));
-
         final var actualId = Objects.requireNonNull(this.mvc.perform(request)
                         .andExpect(status().isCreated())
                         .andReturn()
                         .getResponse()
                         .getHeader("Location"))
                 .replace("/categories/", "");
-
         return CategoryID.from(actualId);
     }
 
@@ -318,13 +309,11 @@ class CategoryE2ETest {
         final var request = MockMvcRequestBuilders.get("/categories/" + id)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON);
-
         final var json = this.mvc.perform(request)
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-
         return Json.readValue(json, CategoryResponse.class);
     }
 
@@ -358,7 +347,6 @@ class CategoryE2ETest {
                 .queryParam("dir", direction)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON);
-
         return this.mvc.perform(request);
     }
 
@@ -366,7 +354,6 @@ class CategoryE2ETest {
         final var request = MockMvcRequestBuilders.put("/categories/" + id.getValue())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(Json.writeValueAsString(requestBody));
-
         return this.mvc.perform(request);
     }
 
@@ -375,7 +362,6 @@ class CategoryE2ETest {
         final var request = MockMvcRequestBuilders.delete("/categories/" + id.getValue())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON);
-
         return this.mvc.perform(request);
     }
 }
