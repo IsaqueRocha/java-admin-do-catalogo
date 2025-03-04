@@ -74,6 +74,22 @@ public class Genre extends AggregateRoot<GenreID> {
         );
     }
 
+    public Genre activate() {
+        this.deletedAt = null;
+        this.active = true;
+        this.updatedAt = Instant.now();
+        return this;
+    }
+
+    public Genre deactivate() {
+        if (this.getDeletedAt() == null) {
+            this.deletedAt = Instant.now();
+        }
+        this.active = false;
+        this.updatedAt = Instant.now();
+        return this;
+    }
+
     @Override
     public void validate(final ValidationHandler handler) {
         new GenreValidator(this, handler).validate();
