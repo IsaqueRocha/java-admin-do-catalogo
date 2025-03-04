@@ -3,7 +3,7 @@ package com.isaque.admin.catalogo.application.category.retrieve.list;
 import com.isaque.admin.catalogo.IntegrationTest;
 import com.isaque.admin.catalogo.application.category.retrive.list.ListCategoriesUseCase;
 import com.isaque.admin.catalogo.domain.category.Category;
-import com.isaque.admin.catalogo.domain.category.CategorySearchQuery;
+import com.isaque.admin.catalogo.domain.pagination.SearchQuery;
 import com.isaque.admin.catalogo.infrastructure.category.persistence.CategoryJpaEntity;
 import com.isaque.admin.catalogo.infrastructure.category.persistence.CategoryRepository;
 import org.junit.jupiter.api.Assertions;
@@ -50,7 +50,7 @@ public class ListCategoriesUseCaseIT {
         final var expectedItemsCount = 0;
         final var expectedTotal = 0;
 
-        final var query = new CategorySearchQuery(
+        final var query = new SearchQuery(
                 expectedPage,
                 expectedPerPage,
                 expectedTerms,
@@ -87,7 +87,7 @@ public class ListCategoriesUseCaseIT {
         final var expectedDirection = "asc";
 
         final var query =
-                new CategorySearchQuery(
+                new SearchQuery(
                         expectedPage,
                         expectedPerPage,
                         expectedTerms,
@@ -122,7 +122,7 @@ public class ListCategoriesUseCaseIT {
     ) {
         final var expectedTerms = "";
 
-        final var query = new CategorySearchQuery(
+        final var query = new SearchQuery(
                 expectedPage,
                 expectedPerPage,
                 expectedTerms,
@@ -157,7 +157,7 @@ public class ListCategoriesUseCaseIT {
         final var expectedDirection = "asc";
         final var expectedTerms = "";
 
-        final var query = new CategorySearchQuery(
+        final var query = new SearchQuery(
                 expectedPage,
                 expectedPerPage,
                 expectedTerms,

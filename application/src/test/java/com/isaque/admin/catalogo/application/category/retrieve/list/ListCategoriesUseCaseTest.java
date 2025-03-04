@@ -4,8 +4,8 @@ import com.isaque.admin.catalogo.application.category.retrive.list.CategoryListO
 import com.isaque.admin.catalogo.application.category.retrive.list.DefaultListCategoriesUseCase;
 import com.isaque.admin.catalogo.domain.category.Category;
 import com.isaque.admin.catalogo.domain.category.CategoryGateway;
-import com.isaque.admin.catalogo.domain.category.CategorySearchQuery;
 import com.isaque.admin.catalogo.domain.pagination.Pagination;
+import com.isaque.admin.catalogo.domain.pagination.SearchQuery;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ public class ListCategoriesUseCaseTest {
         final var expectedSort = "createdAt";
         final var expectedDirection = "asc";
 
-        final var query = new CategorySearchQuery(
+        final var query = new SearchQuery(
                 expectedPage,
                 expectedPerPage,
                 expectedTerms,
@@ -78,7 +78,7 @@ public class ListCategoriesUseCaseTest {
         final var expectedSort = "createdAt";
         final var expectedDirection = "asc";
 
-        final var query = new CategorySearchQuery(
+        final var query = new SearchQuery(
                 expectedPage,
                 expectedPerPage,
                 expectedTerms,
@@ -110,7 +110,7 @@ public class ListCategoriesUseCaseTest {
         final var expectedSort = "createdAt";
         final var expectedDirection = "asc";
 
-        final var query = new CategorySearchQuery(
+        final var query = new SearchQuery(
                 expectedPage,
                 expectedPerPage,
                 expectedTerms,

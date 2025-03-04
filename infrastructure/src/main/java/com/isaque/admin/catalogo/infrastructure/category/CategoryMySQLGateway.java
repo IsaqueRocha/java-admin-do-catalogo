@@ -3,8 +3,8 @@ package com.isaque.admin.catalogo.infrastructure.category;
 import com.isaque.admin.catalogo.domain.category.Category;
 import com.isaque.admin.catalogo.domain.category.CategoryGateway;
 import com.isaque.admin.catalogo.domain.category.CategoryID;
-import com.isaque.admin.catalogo.domain.category.CategorySearchQuery;
 import com.isaque.admin.catalogo.domain.pagination.Pagination;
+import com.isaque.admin.catalogo.domain.pagination.SearchQuery;
 import com.isaque.admin.catalogo.infrastructure.category.persistence.CategoryJpaEntity;
 import com.isaque.admin.catalogo.infrastructure.category.persistence.CategoryRepository;
 import org.springframework.data.domain.PageRequest;
@@ -49,7 +49,7 @@ public class CategoryMySQLGateway implements CategoryGateway {
     }
 
     @Override
-    public Pagination<Category> findAll(final CategorySearchQuery query) {
+    public Pagination<Category> findAll(final SearchQuery query) {
         final var page = PageRequest.of(
                 query.page(),
                 query.perPage(),

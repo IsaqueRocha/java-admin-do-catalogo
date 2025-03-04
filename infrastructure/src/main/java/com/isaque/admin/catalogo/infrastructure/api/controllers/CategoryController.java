@@ -9,12 +9,12 @@ import com.isaque.admin.catalogo.application.category.retrive.list.ListCategorie
 import com.isaque.admin.catalogo.application.category.update.UpdateCategoryCommand;
 import com.isaque.admin.catalogo.application.category.update.UpdateCategoryOutput;
 import com.isaque.admin.catalogo.application.category.update.UpdateCategoryUseCase;
-import com.isaque.admin.catalogo.domain.category.CategorySearchQuery;
 import com.isaque.admin.catalogo.domain.pagination.Pagination;
+import com.isaque.admin.catalogo.domain.pagination.SearchQuery;
 import com.isaque.admin.catalogo.domain.validation.handler.Notification;
 import com.isaque.admin.catalogo.infrastructure.api.CategoryAPI;
-import com.isaque.admin.catalogo.infrastructure.category.models.CategoryResponse;
 import com.isaque.admin.catalogo.infrastructure.category.models.CategoryListResponse;
+import com.isaque.admin.catalogo.infrastructure.category.models.CategoryResponse;
 import com.isaque.admin.catalogo.infrastructure.category.models.CreateCategoryRequest;
 import com.isaque.admin.catalogo.infrastructure.category.presenters.CategoryApiPresenter;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +71,7 @@ public class CategoryController implements CategoryAPI {
             final String sort,
             final String direction
     ) {
-        return this.listCategoriesUseCase.execute(new CategorySearchQuery(page, perPage, search, sort, direction))
+        return this.listCategoriesUseCase.execute(new SearchQuery(page, perPage, search, sort, direction))
                 .map(CategoryApiPresenter::present);
     }
 

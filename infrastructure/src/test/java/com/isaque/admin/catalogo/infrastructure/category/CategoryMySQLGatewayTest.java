@@ -1,9 +1,9 @@
 package com.isaque.admin.catalogo.infrastructure.category;
 
+import com.isaque.admin.catalogo.MySQLGatewayTest;
 import com.isaque.admin.catalogo.domain.category.Category;
 import com.isaque.admin.catalogo.domain.category.CategoryID;
-import com.isaque.admin.catalogo.domain.category.CategorySearchQuery;
-import com.isaque.admin.catalogo.MySQLGatewayTest;
+import com.isaque.admin.catalogo.domain.pagination.SearchQuery;
 import com.isaque.admin.catalogo.infrastructure.category.persistence.CategoryJpaEntity;
 import com.isaque.admin.catalogo.infrastructure.category.persistence.CategoryRepository;
 import org.junit.jupiter.api.Assertions;
@@ -69,7 +69,7 @@ class CategoryMySQLGatewayTest {
 
         final var actualInvalidEntity = repository.findById(category.getId().getValue()).get();
         Assertions.assertEquals("Film", actualInvalidEntity.getName());
-        Assertions.assertNull( actualInvalidEntity.getDescription());
+        Assertions.assertNull(actualInvalidEntity.getDescription());
         Assertions.assertEquals(expectedIsActive, actualInvalidEntity.isActive());
 
         final var updatedCategory = category.clone().update(expectedName, expectedDescription, expectedIsActive);
@@ -169,7 +169,7 @@ class CategoryMySQLGatewayTest {
 
         Assertions.assertEquals(3, repository.count());
 
-        final var query = new CategorySearchQuery(0, 1, "", "name", "asc");
+        final var query = new SearchQuery(0, 1, "", "name", "asc");
         final var actualResult = gateway.findAll(query);
 
         Assertions.assertEquals(expectedPage, actualResult.currentPage());
@@ -187,7 +187,7 @@ class CategoryMySQLGatewayTest {
 
         Assertions.assertEquals(0, repository.count());
 
-        final var query = new CategorySearchQuery(0, 1, "", "name", "asc");
+        final var query = new SearchQuery(0, 1, "", "name", "asc");
         final var actualResult = gateway.findAll(query);
 
         Assertions.assertEquals(expectedPage, actualResult.currentPage());
@@ -198,7 +198,7 @@ class CategoryMySQLGatewayTest {
 
     @Test
     void givenFollowPagination_whenCallsFindAllWithPage1_thenShouldReturnPaginated() {
-         var expectedPage = 0;
+        var expectedPage = 0;
         final var expectedPerPage = 1;
         final var expectedTotal = 3;
 
@@ -216,7 +216,7 @@ class CategoryMySQLGatewayTest {
 
         Assertions.assertEquals(3, repository.count());
 
-        var query = new CategorySearchQuery(0, 1, "", "name", "asc");
+        var query = new SearchQuery(0, 1, "", "name", "asc");
         var actualResult = gateway.findAll(query);
 
         Assertions.assertEquals(expectedPage, actualResult.currentPage());
@@ -227,7 +227,7 @@ class CategoryMySQLGatewayTest {
 
         // PAGE 1
         expectedPage = 1;
-        query = new CategorySearchQuery(1, 1, "", "name", "asc");
+        query = new SearchQuery(1, 1, "", "name", "asc");
         actualResult = gateway.findAll(query);
 
         Assertions.assertEquals(expectedPage, actualResult.currentPage());
@@ -238,7 +238,7 @@ class CategoryMySQLGatewayTest {
 
         // PAGE 2
         expectedPage = 2;
-        query = new CategorySearchQuery(2, 1, "", "name", "asc");
+        query = new SearchQuery(2, 1, "", "name", "asc");
         actualResult = gateway.findAll(query);
 
         Assertions.assertEquals(expectedPage, actualResult.currentPage());
@@ -268,7 +268,7 @@ class CategoryMySQLGatewayTest {
 
         Assertions.assertEquals(3, repository.count());
 
-        final var query = new CategorySearchQuery(0, 1, "doc", "name", "asc");
+        final var query = new SearchQuery(0, 1, "doc", "name", "asc");
         final var actualResult = gateway.findAll(query);
 
         Assertions.assertEquals(expectedPage, actualResult.currentPage());
@@ -298,7 +298,7 @@ class CategoryMySQLGatewayTest {
 
         Assertions.assertEquals(3, repository.count());
 
-        final var query = new CategorySearchQuery(0, 1, "MAIS ASSISTIDA", "name", "asc");
+        final var query = new SearchQuery(0, 1, "MAIS ASSISTIDA", "name", "asc");
         final var actualResult = gateway.findAll(query);
 
         Assertions.assertEquals(expectedPage, actualResult.currentPage());
