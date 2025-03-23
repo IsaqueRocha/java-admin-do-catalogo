@@ -3,6 +3,7 @@ package com.isaque.admin.catalogo.domain.category;
 import com.isaque.admin.catalogo.domain.pagination.Pagination;
 import com.isaque.admin.catalogo.domain.pagination.SearchQuery;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CategoryGateway {
@@ -15,4 +16,6 @@ public interface CategoryGateway {
     Category update(Category category);
 
     Pagination<Category> findAll(SearchQuery query);
+
+    List<CategoryID> existsByIds(Iterable<CategoryID> ids);
 }

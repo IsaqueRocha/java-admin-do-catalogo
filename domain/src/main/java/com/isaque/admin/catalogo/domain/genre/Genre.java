@@ -37,11 +37,7 @@ public class Genre extends AggregateRoot<GenreID> {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.deletedAt = deletedAt;
-        final var notification = Notification.create();
-        validate(notification);
-        if (notification.hasError()) {
-            throw new NotificationException("", notification);
-        }
+        selfValidate();
     }
 
     public static Genre newGenre(final String name, final boolean isActive) {
