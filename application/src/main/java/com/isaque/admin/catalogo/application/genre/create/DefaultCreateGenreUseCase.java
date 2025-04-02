@@ -41,6 +41,10 @@ public class DefaultCreateGenreUseCase extends CreateGenreUseCase {
       throw new NotificationException("Could not create aggregate genre", notification);
     }
 
+//    categories.forEach(genre::addCategory);
+
+    genre.addCategories(categories);
+
     return CreateGenreOutput.from(this.genreGateway.create(genre));
   }
 
@@ -59,7 +63,7 @@ public class DefaultCreateGenreUseCase extends CreateGenreUseCase {
 
       final var missingIdsMessage = missingIds.stream()
           .map(CategoryID::getValue)
-          .collect(Collectors.joining(","));
+          .collect(Collectors.joining(", "));
 
       notification.append(
           new Error("Some categories could not be found: %s".formatted(missingIdsMessage))
