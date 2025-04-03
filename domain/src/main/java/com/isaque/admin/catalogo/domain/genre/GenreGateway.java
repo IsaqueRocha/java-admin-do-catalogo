@@ -6,14 +6,13 @@ import com.isaque.admin.catalogo.domain.pagination.SearchQuery;
 import java.util.Optional;
 
 public interface GenreGateway {
-    Genre create(Genre genre);
+  Genre create(Genre genre);
 
-    void deleteById(GenreID id);
+  void deleteById(GenreID id);
 
-    Optional<Genre> findById(GenreID id);
+  Optional<Genre> findById(GenreID id);
 
-    Genre update(Genre genre);
+  Genre update(Genre genre);
 
-    Pagination<Genre> findAll(SearchQuery query);
-
+  Pagination<Genre> findAll(SearchQuery query);
 }
