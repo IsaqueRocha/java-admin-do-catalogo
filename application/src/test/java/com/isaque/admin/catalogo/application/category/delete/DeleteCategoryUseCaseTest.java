@@ -1,69 +1,68 @@
 package com.isaque.admin.catalogo.application.category.delete;
 
+import com.isaque.admin.catalogo.application.UseCaseTest;
 import com.isaque.admin.catalogo.domain.category.Category;
 import com.isaque.admin.catalogo.domain.category.CategoryGateway;
 import com.isaque.admin.catalogo.domain.category.CategoryID;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
-public class DeleteCategoryUseCaseTest {
-    @InjectMocks
-    private DefaultDeleteCategoryUseCase useCase;
+import java.util.List;
 
-    @Mock
-    private CategoryGateway categoryGateway;
+public class DeleteCategoryUseCaseTest extends UseCaseTest {
+  @InjectMocks
+  private DefaultDeleteCategoryUseCase useCase;
 
-    @BeforeEach
-    void cleanup() {
-        Mockito.reset(categoryGateway);
-    }
+  @Mock
+  private CategoryGateway categoryGateway;
 
-    @Test
-    void givenAValidId_whenCallsDeleteCategory_thenShouldBeOk() {
-        final var category = Category.newCategory(
-                "Filmes",
-                "A categoria mais assistida",
-                true);
-        final var expectedId = category.getId();
+  @Override
+  protected List<Object> getMocks() {
+    return List.of(categoryGateway);
+  }
 
-        Mockito.doNothing().when(categoryGateway).deleteById(Mockito.eq(expectedId));
+  @Test
+  void givenAValidId_whenCallsDeleteCategory_thenShouldBeOk() {
+    final var category = Category.newCategory(
+        "Filmes",
+        "A categoria mais assistida",
+        true);
+    final var expectedId = category.getId();
 
-        Assertions.assertDoesNotThrow(() -> useCase.execute(expectedId.getValue()));
+    Mockito.doNothing().when(categoryGateway).deleteById(Mockito.eq(expectedId));
 
-        Mockito.verify(categoryGateway, Mockito.times(1)).deleteById(expectedId);
-    }
+    Assertions.assertDoesNotThrow(() -> useCase.execute(expectedId.getValue()));
 
-    @Test
-    void givenAnInvalidId_whenCallsDeleteCategory_thenShouldBeOk() {
-        final var expectedId = CategoryID.from("123");
+    Mockito.verify(categoryGateway, Mockito.times(1)).deleteById(expectedId);
+  }
 
-        Mockito.doNothing().when(categoryGateway).deleteById(Mockito.eq(expectedId));
+  @Test
+  void givenAnInvalidId_whenCallsDeleteCategory_thenShouldBeOk() {
+    final var expectedId = CategoryID.from("123");
 
-        Assertions.assertDoesNotThrow(() -> useCase.execute(expectedId.getValue()));
+    Mockito.doNothing().when(categoryGateway).deleteById(Mockito.eq(expectedId));
 
-        Mockito.verify(categoryGateway, Mockito.times(1)).deleteById(expectedId);
-    }
+    Assertions.assertDoesNotThrow(() -> useCase.execute(expectedId.getValue()));
 
-    @Test
-    void givenAValidId_whenGatewayThrowsException_thenShouldBeOk() {
-        final var category = Category.newCategory(
-                "Filmes",
-                "A categoria mais assistida",
-                true);
-        final var expectedId = category.getId();
+    Mockito.verify(categoryGateway, Mockito.times(1)).deleteById(expectedId);
+  }
 
-        Mockito.doThrow(new IllegalStateException("Gateway error")).when(categoryGateway)
-                .deleteById(Mockito.eq(expectedId));
+  @Test
+  void givenAValidId_whenGatewayThrowsException_thenShouldBeOk() {
+    final var category = Category.newCategory(
+        "Filmes",
+        "A categoria mais assistida",
+        true);
+    final var expectedId = category.getId();
 
-        Assertions.assertThrows(IllegalStateException.class, () -> useCase.execute(expectedId.getValue()));
+    Mockito.doThrow(new IllegalStateException("Gateway error")).when(categoryGateway)
+        .deleteById(Mockito.eq(expectedId));
 
-        Mockito.verify(categoryGateway, Mockito.times(1)).deleteById(expectedId);
-    }
+    Assertions.assertThrows(IllegalStateException.class, () -> useCase.execute(expectedId.getValue()));
+
+    Mockito.verify(categoryGateway, Mockito.times(1)).deleteById(expectedId);
+  }
 }
