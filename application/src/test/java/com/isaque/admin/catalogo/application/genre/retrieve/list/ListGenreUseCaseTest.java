@@ -90,7 +90,13 @@ public class ListGenreUseCaseTest extends UseCaseTest {
     Mockito.when(genreGateway.findAll(Mockito.any()))
         .thenReturn(expectedPagination);
 
-    final var searchQuery = new SearchQuery(expectedPage, expectedPerPage, expectedTerms, expectedSort, expectedDirection);
+    final var searchQuery = new SearchQuery(
+        expectedPage,
+        expectedPerPage,
+        expectedTerms,
+        expectedSort,
+        expectedDirection
+    );
 
     // when
     final var actualOutput = useCase.execute(searchQuery);

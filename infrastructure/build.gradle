@@ -20,7 +20,7 @@ version = '1.0-SNAPSHOT'
 
 bootJar {
     archiveFileName = 'infrastructure.jar'
-    destinationDirectory.set(file("${rootProject.layout.buildDirectory}/libs"))
+    destinationDirectory.set(layout.buildDirectory.dir("libs"))
 }
 
 repositories {
@@ -35,7 +35,7 @@ dependencies {
     implementation(project(':domain'))
     implementation(project(':application'))
 
-    implementation ("io.vavr:vavr:0.10.5")
+    implementation("io.vavr:vavr:0.10.5")
 
     implementation('com.mysql:mysql-connector-j:9.2.0')
 
