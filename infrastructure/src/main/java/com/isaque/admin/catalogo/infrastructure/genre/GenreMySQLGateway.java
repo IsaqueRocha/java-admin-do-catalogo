@@ -27,7 +27,10 @@ public class GenreMySQLGateway implements GenreGateway {
 
   @Override
   public void deleteById(final GenreID id) {
-
+    final var genreId = id.getValue();
+    if (this.repository.existsById(genreId)) {
+      this.repository.deleteById(id.getValue());
+    }
   }
 
   @Override

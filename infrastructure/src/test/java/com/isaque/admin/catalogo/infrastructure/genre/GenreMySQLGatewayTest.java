@@ -4,6 +4,7 @@ import com.isaque.admin.catalogo.MySQLGatewayTest;
 import com.isaque.admin.catalogo.domain.category.Category;
 import com.isaque.admin.catalogo.domain.category.CategoryID;
 import com.isaque.admin.catalogo.domain.genre.Genre;
+import com.isaque.admin.catalogo.domain.genre.GenreID;
 import com.isaque.admin.catalogo.infrastructure.category.CategoryMySQLGateway;
 import com.isaque.admin.catalogo.infrastructure.genre.persistence.GenreJpaEntity;
 import com.isaque.admin.catalogo.infrastructure.genre.persistence.GenreRepository;
@@ -20,7 +21,7 @@ class GenreMySQLGatewayTest {
   private CategoryMySQLGateway categoryGateway;
 
   @Autowired
-  private GenreMySQLGateway genreMySQLGateway;
+  private GenreMySQLGateway genreGateway;
 
   @Autowired
   private GenreRepository genreRepository;
@@ -28,7 +29,7 @@ class GenreMySQLGatewayTest {
   @Test
   void testDependencyInjection() {
     Assertions.assertNotNull(categoryGateway);
-    Assertions.assertNotNull(genreMySQLGateway);
+    Assertions.assertNotNull(genreGateway);
     Assertions.assertNotNull(genreRepository);
   }
 
@@ -47,7 +48,7 @@ class GenreMySQLGatewayTest {
 
     Assertions.assertEquals(0, genreRepository.count());
 
-    final var actualGenre = genreMySQLGateway.create(genre);
+    final var actualGenre = genreGateway.create(genre);
 
     Assertions.assertEquals(1, genreRepository.count());
 
@@ -83,7 +84,7 @@ class GenreMySQLGatewayTest {
 
     Assertions.assertEquals(0, genreRepository.count());
 
-    final var actualGenre = genreMySQLGateway.create(genre);
+    final var actualGenre = genreGateway.create(genre);
 
     Assertions.assertEquals(1, genreRepository.count());
 
@@ -127,7 +128,7 @@ class GenreMySQLGatewayTest {
     Assertions.assertEquals("av", genre.getName());
     Assertions.assertEquals(0, genre.getCategories().size());
 
-    final var actualGenre = genreMySQLGateway.update(
+    final var actualGenre = genreGateway.update(
         Genre.with(genre).update(expectedName, expectedIsActive, expectedCategories)
     );
 
@@ -174,7 +175,7 @@ class GenreMySQLGatewayTest {
     Assertions.assertEquals("av", genre.getName());
     Assertions.assertEquals(2, genre.getCategories().size());
 
-    final var actualGenre = genreMySQLGateway.update(
+    final var actualGenre = genreGateway.update(
         Genre.with(genre).update(expectedName, expectedIsActive, expectedCategories)
     );
 
@@ -217,7 +218,7 @@ class GenreMySQLGatewayTest {
     Assertions.assertFalse(genre.isActive());
     Assertions.assertNotNull(genre.getDeletedAt());
 
-    final var actualGenre = genreMySQLGateway.update(
+    final var actualGenre = genreGateway.update(
         Genre.with(genre).update(expectedName, expectedIsActive, expectedCategories)
     );
 
@@ -258,7 +259,7 @@ class GenreMySQLGatewayTest {
     Assertions.assertTrue(genre.isActive());
     Assertions.assertNull(genre.getDeletedAt());
 
-    final var actualGenre = genreMySQLGateway.update(
+    final var actualGenre = genreGateway.update(
         Genre.with(genre).update(expectedName, expectedIsActive, expectedCategories)
     );
 
@@ -280,6 +281,34 @@ class GenreMySQLGatewayTest {
     Assertions.assertEquals(genre.getCreatedAt(), persistedGenre.getCreatedAt());
     Assertions.assertTrue(genre.getUpdatedAt().isBefore(persistedGenre.getUpdatedAt()));
     Assertions.assertNotNull(persistedGenre.getDeletedAt());
+  }
+
+  @Test
+  void givenAPrePersistedGenre_whenCallsDeleteById_thenShouldDeleteGenre() {
+    //given
+    final var genre = Genre.newGenre("Aventura", true);
+
+    genreRepository.saveAndFlush(GenreJpaEntity.from(genre));
+
+    Assertions.assertEquals(1, genreRepository.count());
+
+    // when
+    genreGateway.deleteById(genre.getId());
+
+    //then
+    Assertions.assertEquals(0, genreRepository.count());
+  }
+
+  @Test
+  void givenAInvalidGenre_whenCallsDeleteById_thenShouldDeleteGenre() {
+    //given
+    Assertions.assertEquals(0, genreRepository.count());
+
+    // when
+    genreGateway.deleteById(GenreID.from("invalid"));
+
+    //then
+    Assertions.assertEquals(0, genreRepository.count());
   }
 
   private List<CategoryID> sorted(final List<CategoryID> expectedCategories) {
