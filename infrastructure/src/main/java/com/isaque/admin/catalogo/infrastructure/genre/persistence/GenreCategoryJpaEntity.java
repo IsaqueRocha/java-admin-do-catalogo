@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import java.util.Objects;
 
 @Entity
-@Table(name = "genre_categories")
+@Table(name = "genres_categories")
 public class GenreCategoryJpaEntity {
   @EmbeddedId
   private GenreCategoryID id;
