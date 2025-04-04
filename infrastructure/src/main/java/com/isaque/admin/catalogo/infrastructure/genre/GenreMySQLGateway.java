@@ -25,10 +25,6 @@ public class GenreMySQLGateway implements GenreGateway {
     return save(genre);
   }
 
-  private Genre save(final Genre genre) {
-    return this.repository.save(GenreJpaEntity.from(genre)).toAggregate();
-  }
-
   @Override
   public void deleteById(final GenreID id) {
 
@@ -41,11 +37,15 @@ public class GenreMySQLGateway implements GenreGateway {
 
   @Override
   public Genre update(final Genre genre) {
-    return null;
+    return save(genre);
   }
 
   @Override
   public Pagination<Genre> findAll(final SearchQuery query) {
     return null;
+  }
+
+  private Genre save(final Genre genre) {
+    return this.repository.save(GenreJpaEntity.from(genre)).toAggregate();
   }
 }
