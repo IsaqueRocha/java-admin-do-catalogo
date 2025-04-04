@@ -3,10 +3,11 @@ package com.isaque.admin.catalogo.infrastructure.genre.persistence;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class GenreCategoryID {
+public class GenreCategoryID implements Serializable {
   @Column(name = "genre_id", nullable = false)
   private String genreId;
   @Column(name = "category_id", nullable = false)
