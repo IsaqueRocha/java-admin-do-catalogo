@@ -21,68 +21,70 @@ import static com.isaque.admin.catalogo.infrastructure.utils.SpecificationUtils.
 
 @Component
 public class CategoryMySQLGateway implements CategoryGateway {
-    private final CategoryRepository repository;
+  private final CategoryRepository repository;
 
-    public CategoryMySQLGateway(final CategoryRepository repository) {
-        this.repository = repository;
+  public CategoryMySQLGateway(final CategoryRepository repository) {
+    this.repository = repository;
+  }
+
+  @Override
+  public Category create(final Category category) {
+    return save(category);
+  }
+
+  @Override
+  public void deleteById(final CategoryID id) {
+    final var idValue = id.getValue();
+    if (this.repository.existsById(idValue)) {
+      this.repository.deleteById(idValue);
     }
+  }
 
-    @Override
-    public Category create(final Category category) {
-        return save(category);
-    }
+  @Override
+  public Optional<Category> findById(final CategoryID id) {
+    return this.repository.findById(id.getValue()).map(CategoryJpaEntity::toAggregate);
+  }
 
-    @Override
-    public void deleteById(final CategoryID id) {
-        final var idValue = id.getValue();
-        if (this.repository.existsById(idValue)) {
-            this.repository.deleteById(idValue);
-        }
-    }
+  @Override
+  public Category update(final Category category) {
+    return save(category);
+  }
 
-    @Override
-    public Optional<Category> findById(final CategoryID id) {
-        return this.repository.findById(id.getValue()).map(CategoryJpaEntity::toAggregate);
-    }
+  @Override
+  public Pagination<Category> findAll(final SearchQuery query) {
+    final var page = PageRequest.of(
+        query.page(),
+        query.perPage(),
+        Sort.by(Direction.fromString(query.direction()), query.sort()));
 
-    @Override
-    public Category update(final Category category) {
-        return save(category);
-    }
+    final var specifications = Optional.ofNullable(query.terms())
+        .filter(str -> !str.isBlank())
+        .map(this::assembleSpecification)
+        .orElse(null);
 
-    @Override
-    public Pagination<Category> findAll(final SearchQuery query) {
-        final var page = PageRequest.of(
-                query.page(),
-                query.perPage(),
-                Sort.by(Direction.fromString(query.direction()), query.sort()));
+    final var pageResult = this.repository.findAll(Specification.where(specifications), page);
 
-        final var specifications = Optional.ofNullable(query.terms())
-                .filter(str -> !str.isBlank())
-                .map(str -> {
-                    final Specification<CategoryJpaEntity> nameLike = like("name", str);
-                    final Specification<CategoryJpaEntity> descriptionLike = like("description", str);
-                    return nameLike.or(descriptionLike);
-                })
-                .orElse(null);
+    return new Pagination<>(
+        pageResult.getNumber(),
+        pageResult.getSize(),
+        pageResult.getTotalElements(),
+        pageResult.map(CategoryJpaEntity::toAggregate).toList()
+    );
+  }
 
-        final var pageResult = this.repository.findAll(Specification.where(specifications), page);
+  @Override
+  public List<CategoryID> existsByIds(final Iterable<CategoryID> ids) {
+    // TODO: implementar quando chegar na camada de infraestrutura de genre
+    return Collections.emptyList();
+  }
 
-        return new Pagination<>(
-                pageResult.getNumber(),
-                pageResult.getSize(),
-                pageResult.getTotalElements(),
-                pageResult.map(CategoryJpaEntity::toAggregate).toList()
-        );
-    }
+  private Category save(final Category category) {
+    return this.repository.save(CategoryJpaEntity.from(category)).toAggregate();
+  }
 
-    @Override
-    public List<CategoryID> existsByIds(final Iterable<CategoryID> ids) {
-        // TODO: implementar quando chegar na camada de infraestrutura de genre
-        return Collections.emptyList();
-    }
-
-    private Category save(final Category category) {
-        return this.repository.save(CategoryJpaEntity.from(category)).toAggregate();
-    }
+  private Specification<CategoryJpaEntity> assembleSpecification(final String str) {
+    final Specification<CategoryJpaEntity> nameLike = like("name", str);
+    final Specification<CategoryJpaEntity> descriptionLike = like("description", str);
+    return nameLike.or(descriptionLike);
+  }
 }
