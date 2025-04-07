@@ -16,6 +16,7 @@ spring:
     url: jdbc:mysql://${mysql.url}/${mysql.schema}?useSSL=true&serverTimeZone=UTC&characterEncoding=UTF-8
     username: ${mysql.username}
     password: ${mysql.password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       auto-commit: false
       connection-timeout: 250 # É uma configuração em milliseconds. O ideal é manter baixo para que estoure timeout logo e não prenda as threads.
@@ -28,8 +29,10 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: none
+    transaction:
+      coordinator_class: jpa
     properties:
-      "[hibernate.dialect]": org.hibernate.dialect.MySQL8Dialect
+      "[hibernate.dialect]": org.hibernate.dialect.MySQLDialect
       "[hibernate.generate_statistics]": false
       "[hibernate.connection.provider_disables_autocommit]": true
       # Para aumentar a performance ao máximo, desabilitamos o auto-commit e o open-in-view.
