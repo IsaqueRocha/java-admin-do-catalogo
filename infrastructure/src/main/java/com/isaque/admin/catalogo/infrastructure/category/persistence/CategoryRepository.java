@@ -27,3 +27,4 @@ public interface CategoryRepository extends JpaRepository<CategoryJpaEntity, Str
 | List<String> existsByIds(List<String> ids); // NOSONAR
 |
 |--------------------------------------------------------------------------
+*/
