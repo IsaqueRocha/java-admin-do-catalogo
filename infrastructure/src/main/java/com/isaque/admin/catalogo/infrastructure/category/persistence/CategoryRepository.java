@@ -4,7 +4,26 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface CategoryRepository extends JpaRepository<CategoryJpaEntity, String> {
-    Page<CategoryJpaEntity> findAll(Specification<CategoryJpaEntity> whereClause, Pageable page);
+  Page<CategoryJpaEntity> findAll(Specification<CategoryJpaEntity> whereClause, Pageable page);
+
+
+  @Query(value = "select c.id from Category c where c.id in :ids")
+  List<String> existsByIds(@Param("ids") List<String> ids);
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Alternative query for existsByIds
+|--------------------------------------------------------------------------
+|
+| @Query(value = "select c.id from Category c where c.id in ?1")
+| List<String> existsByIds(List<String> ids); // NOSONAR
+|
+|--------------------------------------------------------------------------
